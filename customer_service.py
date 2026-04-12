@@ -3,7 +3,7 @@ from langchain_core.messages import SystemMessage,AIMessage,HumanMessage
 from langchain_core.prompts import PromptTemplate,ChatMessagePromptTemplate,MessagesPlaceholder,ChatPromptTemplate
 from dotenv import load_dotenv
 
-from datetime import datetime
+from datetime import datetime,timedelta
 
 import os
 
@@ -72,10 +72,18 @@ def generate_ticketID(reason):
 
 def save_ticket(ticket_id,chat_history,Ticket_status):
     file_name = f"{ticket_id}.txt"
+    parts = ticket_id.split("-")
+
+    created_date = "-".join(parts[1:4])  #extracted created date from Report id 
+    updated_date = created_date    
 
     with open(file_name,"w") as f:
-        f.write(f"Trcket ID : {ticket_id}")
-        f.write(f" Ticket Status : {Ticket_status}")
+        f.write(f"Ticket ID: {ticket_id}\n")
+        f.write(f"Status: {Ticket_status}\n")
+        f.write(f"Created Date: {created_date}\n")
+        f.write(f"Updated Date: {created_date}\n")
+
+        f.write("Note: This ticket will automatically close after 30 days of inactivity.\n\n")
 
         for message in chat_history:
             role = message[0]
@@ -83,9 +91,36 @@ def save_ticket(ticket_id,chat_history,Ticket_status):
             f.write(f"{role.upper()} : {content}\n")
 
 
+def open_existing_ticket(ticket_id):
+    file_name = f"{ticket_id}.txt"
+    if not os.path.exists(file_name):
+        return None
+    
+    updated_date_bool = False
+    updated_date = datetime.now().strftime("%Y-%m-%d")
+    new_lines = []
+
+    
+    with open(file_name,"r") as f:
+        lines = f.readlines()
+    for line in lines:
+        if "Updated Date" in line:
+            new_lines.append(f"Updated Date : {updated_date}")
+        else:
+            new_lines.append(line)
+    
+    if not updated_date_bool:
+         new_lines.append(f" Updated Date : {updated_date}")
+
+    with open(file_name,"w") as f:
+        f.writable(new_lines)
+        f.close()
+
 
 
 chat_history = []
+
+today = datetime.now()
 
 while True:
     user_input = input("User : ")
@@ -117,15 +152,3 @@ while True:
 
     if ticket_id:
         save_ticket(ticket_id=ticket_id,chat_history=chat_history,Ticket_status="open")
-
-
-
-
-
-
-
-
-
-
-
-
