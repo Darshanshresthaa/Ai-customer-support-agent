@@ -1,0 +1,179 @@
+📘 AI Customer Support Agent with Simulated Memory
+🧠 Problem Statement
+
+In real-world businesses, customers often need to interact with human support agents for every issue. This creates several challenges:
+
+High operational cost
+Slow response time
+Limited scalability
+Inconsistent support quality
+
+To address this, I built an AI-powered customer support assistant that can:
+
+Answer customer queries about the store
+Guide users step-by-step to resolve issues
+Automatically detect problems
+Generate and manage support tickets
+🎯 Objective
+
+The goal of this project is to design a system where:
+
+Customers can interact with an AI instead of a human agent
+The AI can retain conversation context (simulate memory)
+The system can generate structured support tickets
+The AI provides clear, guided solutions
+⚙️ System Overview
+
+The system works as an interactive CLI-based customer support assistant powered by an LLM.
+
+🔄 Workflow
+User Input
+   ↓
+Intent Detection (Issue / Normal)
+   ↓
+Ticket Generation (if Issue)
+   ↓
+Load Chat History
+   ↓
+Send Context to LLM
+   ↓
+Generate Response
+   ↓
+Store Conversation
+🧠 Key Challenge: LLM Has No Memory
+
+Large Language Models do not retain memory across interactions.
+
+❗ Problem
+
+Each new query:
+
+Does not remember previous conversation
+Breaks continuity in customer support
+✅ Solution Implemented
+
+To simulate memory:
+
+Store conversation history in a list (chat_history)
+Pass entire history to the LLM using:
+MessagesPlaceholder in LangChain
+MessagesPlaceholder(variable_name='chat_history')
+
+This allows the model to behave as if it "remembers" previous interactions.
+
+📁 Iteration 1: Storing Conversation in TXT
+
+Initially, conversations were stored in .txt files.
+
+Example Format
+Ticket ID: ReportID-2026-04-11-000001
+Status: open
+Created Date: 2026-04-11
+Updated Date: 2026-04-11
+
+HUMAN : My order is late
+AI : Sorry for the delay
+❌ Limitations
+Unstructured format
+Difficult to parse programmatically
+Not scalable
+Poor readability for complex conversations
+🔄 Iteration 2: Moving Toward JSON (Planned Improvement)
+
+To solve .txt limitations, the system is being upgraded to use JSON format.
+
+✅ Benefits
+Structured and machine-readable
+Easy to process and update
+Better for scaling and analytics
+Cleaner data representation
+🧩 Core Components
+1. LLM Configuration
+
+Uses:
+
+ChatOpenAI
+Model: meta-llama/llama-3-8b-instruct
+API via OpenRouter
+2. Prompt Engineering
+
+A structured system prompt ensures consistent behavior:
+
+Polite and professional tone
+Step-by-step guidance
+Ask for Order ID when needed
+Handle refunds clearly
+3. Intent Detection
+
+Function:
+
+detect_problms(query)
+
+Classifies input into:
+
+ISSUE
+NORMAL
+
+Used to decide whether a ticket should be created.
+
+4. Ticket Generation
+
+Function:
+
+generate_ticketID(reason)
+
+Creates unique ticket IDs:
+
+ReportID-YYYY-MM-DD-XXXXXX
+5. Ticket Storage
+
+Function:
+
+save_ticket(ticket_id, chat_history, Ticket_status)
+
+Stores:
+
+Ticket metadata
+Full conversation
+Status and timestamps
+6. Ticket Retrieval & Update
+
+Function:
+
+open_existing_ticket(ticket_id)
+Opens existing ticket
+Updates last modified date
+💡 Key Features
+✅ AI-powered customer interaction
+✅ Automatic issue detection
+✅ Ticket generation system
+✅ Conversation persistence (simulated memory)
+✅ Step-by-step problem resolution
+✅ Structured prompt design
+⚠️ Challenges Faced
+1. Memory Limitation of LLM
+Solved using conversation history injection
+2. Unstructured Data Storage
+.txt format was messy and hard to scale
+3. Context Handling
+Feeding entire history increases token usage
+🚀 Future Improvements
+
+To make this system production-ready:
+
+🔹 Convert .txt → JSON بالكامل
+🔹 Add conversation summarization
+🔹 Use vector database (FAISS / Chroma)
+🔹 Add sentiment analysis
+🔹 Build Streamlit UI
+🔹 Multi-user ticket handling system
+🏁 Conclusion
+
+This project demonstrates how to build a real-world AI customer support system by:
+
+Simulating memory in stateless LLMs
+Structuring conversations for persistence
+Designing intelligent prompts
+Automating ticket generation and support flow
+
+It highlights the transition from a basic prototype (.txt-based) to a scalable architecture (JSON + memory strategies).

@@ -39,7 +39,7 @@ Rules you should follow:
 def detect_problms(query):
     prompt = f"""
 Classify the intent into ONLY ONE WORD:
-ISSUE or NORMAL
+ISSUE or NORMAL or CLOSE-TICKET
 
 Message: {query}
 """
@@ -49,6 +49,9 @@ Message: {query}
 
         if "ISSUE" in reason:
             return "Issue"
+        
+        elif "CLOSE-TICKET" in reason:
+            return "Close Ticket"
         else:
             return "Normal Questioning"
 
@@ -91,6 +94,33 @@ def save_ticket(ticket_id,chat_history,Ticket_status):
             f.write(f"{role.upper()} : {content}\n")
 
 
+def close_ticket(ticket_id):
+    file_name =f"{ticket_id}.txt"
+    new_line =[]
+    if not os.path.exists(file_name):
+        return None
+    
+
+
+    update_status = False
+    
+    with open(file_name,"r") as f:
+        lines = f.readlines()
+        for line in lines:
+            
+            if "Updated Data" in line:
+                updated_date = line.split("-")
+
+                current_date = datetime.now().strftime("%Y-%m-%d")
+                present_date = current_date.split("-")[1] - updated_date[1]
+
+                if present_date >=30:
+                    new_line.append(line)
+
+
+
+
+
 def open_existing_ticket(ticket_id):
     file_name = f"{ticket_id}.txt"
     if not os.path.exists(file_name):
@@ -113,8 +143,10 @@ def open_existing_ticket(ticket_id):
          new_lines.append(f" Updated Date : {updated_date}")
 
     with open(file_name,"w") as f:
-        f.writable(new_lines)
+        f.writeline(new_lines)
         f.close()
+
+
 
 
 
